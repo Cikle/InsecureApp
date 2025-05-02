@@ -22,7 +22,8 @@ namespace M183.Controllers
             var user = _context.Users.Find(userId);
             if (user == null) return NotFound();
 
-            user.TwoFactorSecret = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 10);
+            // Generate a proper secret key for Google Authenticator
+            user.TwoFactorSecret = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             _context.SaveChanges();
 
             return Ok(new { SecretKey = user.TwoFactorSecret });

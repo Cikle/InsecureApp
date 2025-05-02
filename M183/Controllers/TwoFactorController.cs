@@ -47,7 +47,7 @@ namespace M183.Controllers
             if (user == null) return NotFound();
 
             TwoFactorAuthenticator tfa = new TwoFactorAuthenticator();
-            bool isValid = tfa.ValidateTwoFactorPIN(user.TwoFactorSecret, request.Code);
+            bool isValid = tfa.ValidateTwoFactorPIN(user.TwoFactorSecret, request.Code, TimeSpan.FromMinutes(2));
 
             if (!isValid) return BadRequest("Invalid code");
 
