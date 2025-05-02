@@ -213,3 +213,65 @@ function createNewsList(data) {
         main.appendChild(divEntry);
     }
 }
+function onLogin() {  
+   var inputUsername = document.getElementById('username');  
+   var inputPassword = document.getElementById('password');  
+   var inputTwoFactorCode = document.getElementById('twoFactorCode');  
+
+   if (!inputUsername.value) {  
+       toastr.warning('Username cannot be empty', 'Warning');  
+   }  
+   else if (!inputPassword.value) {  
+       toastr.warning('Password cannot be empty', 'Warning');  
+   }  
+   else {  
+       fetch('/api/Login/', {  
+           method: 'POST',  
+           headers: {  
+               'Accept': 'application/json',  
+               'Content-Type': 'application/json'  
+           },  
+           body: JSON.stringify({  
+               Username: inputUsername.value,  
+               Password: inputPassword.value,  
+               TwoFactorCode: inputTwoFactorCode?.value  
+           })  
+       })  
+       .then(response => {  
+           if (response.ok) {  
+               return response.json();  
+           } else {  
+               throw new Error('Login failed');  
+           }  
+       })  
+       .then(data => {  
+           localStorage.setItem('jwtToken', data.token);  
+           window.location.href = '/home';  
+       })  
+       .catch(error => {  
+           toastr.error(error.message, 'Error');  
+       });  
+   }  
+}  
+
+/* 2FA Code */  
+var labelTwoFactor = document.createElement('label');  
+labelTwoFactor.innerText = '2FA Code (if enabled):';  
+
+var inputTwoFactor = document.createElement('input');  
+inputTwoFactor.type = 'text';  
+inputTwoFactor.id = 'twoFactorCode';  
+
+var divTwoFactor = document.createElement('div');  
+divTwoFactor.innerHTML += '<br>';  
+divTwoFactor.appendChild(labelTwoFactor);  
+divTwoFactor.innerHTML += '<br>';  
+divTwoFactor.appendChild(inputTwoFactor);  
+
+/* Login form. */  
+var loginForm = document.createElement('form');  
+loginForm.action = 'javascript:onLogin()';  
+loginForm.appendChild(divUsername);  
+loginForm.appendChild(divPassword);  
+loginForm.appendChild(divTwoFactor);  
+loginForm.appendChild(divButton);
