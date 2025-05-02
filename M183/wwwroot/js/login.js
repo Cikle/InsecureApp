@@ -111,7 +111,7 @@ function createLoginForm() {
     labelResult.classList.add("hidden");
 
     var divResult = document.createElement("div");
-    divResult.appendChild(labelResult);
+    divResult.appendChild(labelResult); 
 
     /* Login button. */
     var submitButton = document.createElement("input");
