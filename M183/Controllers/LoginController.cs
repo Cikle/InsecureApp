@@ -66,7 +66,11 @@ namespace M183.Controllers
                 }
 
                 TwoFactorAuthenticator tfa = new TwoFactorAuthenticator();
-                bool isValid = tfa.ValidateTwoFactorPIN(user.TwoFactorSecret, request.TwoFactorCode, TimeSpan.FromSeconds(30));
+                bool isValid = tfa.ValidateTwoFactorPIN(
+                    user.TwoFactorSecret, 
+                    request.TwoFactorCode, 
+                    TimeSpan.FromSeconds(30),
+                    null); // Use null for default verification window
                 
                 if (!isValid)
                 {

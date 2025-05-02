@@ -3,6 +3,7 @@ using M183.Controllers.Dto;
 using M183.Data;
 using M183.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace M183.Controllers
 {
@@ -25,7 +26,11 @@ namespace M183.Controllers
 
             TwoFactorAuthenticator tfa = new TwoFactorAuthenticator();
             // Generate a proper Base32 secret key (recommended length for Google Authenticator)
-            string key = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 16).ToUpper();
+            // Generate a proper Base32 secret key (recommended length for Google Authenticator)
+            string key = Base32Encoding.ToString(Encoding.ASCII.GetBytes(Guid.NewGuid().ToString()))
+                .Replace("=", "")
+                .Substring(0, 16)
+                .ToUpper();
             
             // Save the secret to user before generating QR code
             user.TwoFactorSecret = key;
@@ -52,7 +57,11 @@ namespace M183.Controllers
             if (user == null) return NotFound();
 
             TwoFactorAuthenticator tfa = new TwoFactorAuthenticator();
-            bool isValid = tfa.ValidateTwoFactorPIN(user.TwoFactorSecret, request.Code, TimeSpan.FromSeconds(30));
+            bool isValid = tfa.ValidateTwoFactorPIN(
+                user.TwoFactorSecret, 
+                request.Code, 
+                TimeSpan.FromSeconds(30),
+                null); // Use null for default verification window
 
             if (!isValid) return BadRequest("Invalid code");
 
