@@ -41,7 +41,7 @@ namespace M183.Controllers
                 user.Username,
                 key,
                 false,
-                300); // Larger QR code for better scanning
+                3); // Smaller QR code (3 = 150x150px)
 
             return Ok(new {
                 QrCodeImageUrl = setupInfo.QrCodeSetupImageUrl,
@@ -60,8 +60,7 @@ namespace M183.Controllers
             bool isValid = tfa.ValidateTwoFactorPIN(
                 user.TwoFactorSecret, 
                 request.Code, 
-                TimeSpan.FromSeconds(30),
-                false); // Use null for default verification window
+                TimeSpan.FromSeconds(90)); // Increased time window to 90 seconds
 
             if (!isValid) return BadRequest("Invalid code");
 

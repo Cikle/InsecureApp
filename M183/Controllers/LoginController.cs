@@ -69,8 +69,7 @@ namespace M183.Controllers
                 bool isValid = tfa.ValidateTwoFactorPIN(
                    user.TwoFactorSecret,
                    request.TwoFactorCode,
-                   TimeSpan.FromSeconds(30),
-                   false); // Use 'false' for default verification window  
+                   TimeSpan.FromSeconds(90)); // Increased time window to 90 seconds
                 
                 if (!isValid)
                 {
