@@ -23,30 +23,24 @@ namespace M183.Controllers
         {
             var user = _context.Users.Find(userId);
             if (user == null) return NotFound();
+            if (string.IsNullOrEmpty(user.TwoFactorSecret)) 
+                return BadRequest("Enable 2FA first to get a secret key");
 
             TwoFactorAuthenticator tfa = new TwoFactorAuthenticator();
-            // Generate a proper Base32 secret key (recommended length for Google Authenticator)
-            // Generate a proper Base32 secret key (recommended length for Google Authenticator)
-            string key = Base32Encoding.ToString(Encoding.ASCII.GetBytes(Guid.NewGuid().ToString()))
-                .Replace("=", "")
-                .Substring(0, 16)
-                .ToUpper();
-            
-            // Save the secret to user before generating QR code
-            user.TwoFactorSecret = key;
-            _context.SaveChanges();
             
             var setupInfo = tfa.GenerateSetupCode(
                 "M183 Insecure App",
                 user.Username,
-                key,
+                user.TwoFactorSecret,
                 false,
                 3); // Smaller QR code (3 = 150x150px)
 
             return Ok(new {
                 QrCodeImageUrl = setupInfo.QrCodeSetupImageUrl,
                 ManualEntryKey = setupInfo.ManualEntryKey,
-                SecretKey = key
+                SecretKey = user.TwoFactorSecret,
+                UserId = user.Id,
+                Username = user.Username
             });
         }
 

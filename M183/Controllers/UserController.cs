@@ -22,11 +22,22 @@ namespace M183.Controllers
             var user = _context.Users.Find(userId);
             if (user == null) return NotFound();
 
-            // Generate a proper secret key for Google Authenticator
-            user.TwoFactorSecret = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            // Generate a proper Base32 secret key
+            string key = Base32Encoding.ToString(Encoding.ASCII.GetBytes(Guid.NewGuid().ToString()))
+                .Replace("=", "")
+                .Substring(0, 16)
+                .ToUpper();
+
+            // Reset 2FA status
+            user.TwoFactorSecret = key;
+            user.TwoFactorEnabled = false;
             _context.SaveChanges();
 
-            return Ok(new { SecretKey = user.TwoFactorSecret });
+            return Ok(new { 
+                SecretKey = key,
+                UserId = user.Id,
+                Username = user.Username
+            });
         }
 
         [HttpPost("disable-2fa/{userId}")]

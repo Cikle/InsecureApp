@@ -1,4 +1,5 @@
 function setupTwoFactor() {
+    // First enable 2FA and get secret key
     fetch(`/api/User/enable-2fa/${getUserid()}`, {
         method: 'POST',
         headers: {
@@ -9,10 +10,19 @@ function setupTwoFactor() {
     })
     .then(response => response.json())
     .then(data => {
-        createTwoFactorSetupForm(data.secretKey);
+        // Then get QR code with the new secret
+        fetch(`/api/TwoFactor/setup/${data.UserId}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+            }
+        })
+        .then(response => response.json())
+        .then(qrData => {
+            createTwoFactorSetupForm(qrData.secretKey);
+        });
     })
     .catch(error => {
-        alert('Error setting up 2FA: ' + error);
+        toastr.error('Error setting up 2FA: ' + error.message, 'Error');
     });
 }
 
