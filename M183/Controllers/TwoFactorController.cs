@@ -24,14 +24,19 @@ namespace M183.Controllers
             if (user == null) return NotFound();
 
             TwoFactorAuthenticator tfa = new TwoFactorAuthenticator();
-            string key = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 10);
+            // Generate a proper Base32 secret key (recommended length for Google Authenticator)
+            string key = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 16).ToUpper();
+            
+            // Save the secret to user before generating QR code
+            user.TwoFactorSecret = key;
+            _context.SaveChanges();
             
             var setupInfo = tfa.GenerateSetupCode(
-                "M183 Insecure App", 
-                user.Username, 
-                key, 
-                false, 
-                3);
+                "M183 Insecure App",
+                user.Username,
+                key,
+                false,
+                300); // Larger QR code for better scanning
 
             return Ok(new {
                 QrCodeImageUrl = setupInfo.QrCodeSetupImageUrl,
@@ -47,7 +52,7 @@ namespace M183.Controllers
             if (user == null) return NotFound();
 
             TwoFactorAuthenticator tfa = new TwoFactorAuthenticator();
-            bool isValid = tfa.ValidateTwoFactorPIN(user.TwoFactorSecret, request.Code, TimeSpan.FromMinutes(2));
+            bool isValid = tfa.ValidateTwoFactorPIN(user.TwoFactorSecret, request.Code, TimeSpan.FromSeconds(30));
 
             if (!isValid) return BadRequest("Invalid code");
 
