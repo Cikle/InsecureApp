@@ -254,24 +254,66 @@ function onLogin() {
    }  
 }  
 
-/* 2FA Code */  
-var labelTwoFactor = document.createElement('label');  
-labelTwoFactor.innerText = '2FA Code (if enabled):';  
+function createLoginForm() {
+    /* Username. */
+    var labelUsername = document.createElement('label');
+    labelUsername.innerText = 'Username';
 
-var inputTwoFactor = document.createElement('input');  
-inputTwoFactor.type = 'text';  
-inputTwoFactor.id = 'twoFactorCode';  
+    var inputUsername = document.createElement('input');
+    inputUsername.id = 'username';
+    inputUsername.type = 'text';
 
-var divTwoFactor = document.createElement('div');  
-divTwoFactor.innerHTML += '<br>';  
-divTwoFactor.appendChild(labelTwoFactor);  
-divTwoFactor.innerHTML += '<br>';  
-divTwoFactor.appendChild(inputTwoFactor);  
+    var divUsername = document.createElement('div');
+    divUsername.appendChild(labelUsername);
+    divUsername.innerHTML += '<br>';
+    divUsername.appendChild(inputUsername);
 
-/* Login form. */  
-var loginForm = document.createElement('form');  
-loginForm.action = 'javascript:onLogin()';  
-loginForm.appendChild(divUsername);  
-loginForm.appendChild(divPassword);  
-loginForm.appendChild(divTwoFactor);  
-loginForm.appendChild(divButton);
+    /* Password. */
+    var labelPassword = document.createElement('label');
+    labelPassword.innerText = 'Password';
+
+    var inputPassword = document.createElement('input');
+    inputPassword.id = 'password';
+    inputPassword.type = 'password';
+
+    var divPassword = document.createElement('div');
+    divPassword.innerHTML += '<br>';
+    divPassword.appendChild(labelPassword);
+    divPassword.innerHTML += '<br>';
+    divPassword.appendChild(inputPassword);
+
+    /* 2FA Code */
+    var labelTwoFactor = document.createElement('label');
+    labelTwoFactor.innerText = '2FA Code (if enabled):';
+
+    var inputTwoFactor = document.createElement('input');
+    inputTwoFactor.type = 'text';
+    inputTwoFactor.id = 'twoFactorCode';
+
+    var divTwoFactor = document.createElement('div');
+    divTwoFactor.innerHTML += '<br>';
+    divTwoFactor.appendChild(labelTwoFactor);
+    divTwoFactor.innerHTML += '<br>';
+    divTwoFactor.appendChild(inputTwoFactor);
+
+    /* Login button. */
+    var submitButton = document.createElement('input');
+    submitButton.type = 'submit';
+    submitButton.value = 'Login';
+
+    var divButton = document.createElement('div');
+    divButton.innerHTML += '<br>';
+    divButton.appendChild(submitButton);
+
+    /* Login form. */
+    var loginForm = document.createElement('form');
+    loginForm.action = 'javascript:onLogin()';
+    loginForm.appendChild(divUsername);
+    loginForm.appendChild(divPassword);
+    loginForm.appendChild(divTwoFactor);
+    loginForm.appendChild(divButton);
+
+    var main = document.getElementById('main');
+    main.innerHTML = '';
+    main.appendChild(loginForm);
+}
