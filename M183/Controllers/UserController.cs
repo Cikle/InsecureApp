@@ -2,6 +2,8 @@
 using M183.Controllers.Helper;
 using M183.Data;
 using Microsoft.AspNetCore.Mvc;
+using System.Text; // For Encoding
+using Google.Authenticator; // For Base32Encoding (if using Google Authenticator)
 
 namespace M183.Controllers
 {

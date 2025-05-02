@@ -80,5 +80,17 @@
         <member name="M:M183.Migrations.InitialData.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:M183.Migrations.AddTwoFactorColumns">
+            <inheritdoc />
+        </member>
+        <member name="M:M183.Migrations.AddTwoFactorColumns.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:M183.Migrations.AddTwoFactorColumns.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:M183.Migrations.AddTwoFactorColumns.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
     </members>
 </doc>
