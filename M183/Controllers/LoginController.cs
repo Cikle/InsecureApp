@@ -73,8 +73,8 @@ namespace M183.Controllers
                 bool isValid = tfa.ValidateTwoFactorPIN(
                    user.TwoFactorSecret,
                    request.TwoFactorCode,
-                   TimeSpan.FromSeconds(90));
-                
+                   TimeSpan.FromSeconds(30)); // 30 Sekunden Zeitfenster
+
                 if (!isValid)
                 {
                     return Unauthorized(new {
