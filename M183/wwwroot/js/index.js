@@ -220,41 +220,49 @@ function onLogin() {
 
    if (!inputUsername.value) {  
        toastr.warning('Username cannot be empty', 'Warning');  
+       return;
    }  
-   else if (!inputPassword.value) {  
+   if (!inputPassword.value) {  
        toastr.warning('Password cannot be empty', 'Warning');  
+       return;
    }  
-   else {  
-       fetch('/api/Login/', {  
-           method: 'POST',  
-           headers: {  
-               'Accept': 'application/json',  
-               'Content-Type': 'application/json'  
-           },  
-           body: JSON.stringify({  
-               Username: inputUsername.value,  
-               Password: inputPassword.value,  
-               TwoFactorCode: inputTwoFactorCode?.value  
-           })  
-       })  
-       .then(response => {  
-           if (response.ok) {  
-               return response.json();  
-           } else {  
-               throw new Error('Login failed');  
-           }  
-       })  
-       .then(data => {  
-           localStorage.setItem('jwtToken', data.token);  
-           window.location.href = '/home';  
-       })  
-       .catch(error => {  
-           toastr.error(error.message, 'Error');  
-       });  
-   }  
-}  
 
-function createLoginForm() {
+   fetch('/api/Login/', {  
+       method: 'POST',  
+       headers: {  
+           'Accept': 'application/json',  
+           'Content-Type': 'application/json'  
+       },  
+       body: JSON.stringify({  
+           Username: inputUsername.value,  
+           Password: inputPassword.value,  
+           TwoFactorCode: inputTwoFactorCode?.value  
+       })  
+   })  
+   .then(response => {
+       if (response.ok) {
+           return response.json();
+       }
+       return response.json().then(err => { throw err; });
+   })
+   .then(data => {  
+       localStorage.setItem('jwtToken', data.token);  
+       localStorage.setItem('userId', data.userId);
+       localStorage.setItem('username', data.username);
+       window.location.href = 'index.html';  
+   })  
+   .catch(error => {
+       if (error.Requires2FA) {
+           // Show 2FA input field if not already visible
+           if (!document.getElementById('twoFactorCode')) {
+               createLoginForm(true);
+           }
+       }
+       toastr.error(error.Message || 'Login failed', 'Error');  
+   });  
+}
+
+function createLoginForm(showTwoFactor = false) {
     /* Username. */
     var labelUsername = document.createElement('label');
     labelUsername.innerText = 'Username';
