@@ -62,23 +62,36 @@ namespace M183.Controllers
             {
                 if (string.IsNullOrEmpty(request.TwoFactorCode))
                 {
-                    return Unauthorized("2FA code required");
+                    return Unauthorized(new { 
+                        Message = "2FA code required",
+                        Requires2FA = true,
+                        UserId = user.Id
+                    });
                 }
 
                 TwoFactorAuthenticator tfa = new TwoFactorAuthenticator();
                 bool isValid = tfa.ValidateTwoFactorPIN(
                    user.TwoFactorSecret,
                    request.TwoFactorCode,
-                   TimeSpan.FromSeconds(90)); // Increased time window to 90 seconds
+                   TimeSpan.FromSeconds(90));
                 
                 if (!isValid)
                 {
-                    return Unauthorized("Invalid 2FA code");
+                    return Unauthorized(new {
+                        Message = "Invalid 2FA code",
+                        Requires2FA = true,
+                        UserId = user.Id
+                    });
                 }
             }
 
             var token = GenerateJwtToken(user);
-            return Ok(token);
+            return Ok(new {
+                Token = token,
+                UserId = user.Id,
+                Username = user.Username,
+                IsAdmin = user.IsAdmin
+            });
         }
 
         private string GenerateJwtToken(User user)
