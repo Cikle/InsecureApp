@@ -249,7 +249,10 @@ function onLogin() {
        localStorage.setItem('jwtToken', data.token);  
        localStorage.setItem('userId', data.userId);
        localStorage.setItem('username', data.username);
-       window.location.href = 'index.html';  
+       localStorage.setItem('isAdmin', data.isAdmin);
+       
+       // Force full page reload to ensure all state is initialized
+       window.location.href = 'index.html?reload=' + new Date().getTime();
    })  
    .catch(error => {
        if (error.Requires2FA) {

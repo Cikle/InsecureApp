@@ -87,10 +87,10 @@ namespace M183.Controllers
 
             var token = GenerateJwtToken(user);
             return Ok(new {
-                Token = token,
-                UserId = user.Id,
-                Username = user.Username,
-                IsAdmin = user.IsAdmin
+                token = token,
+                userId = user.Id,
+                username = user.Username,
+                isAdmin = user.IsAdmin
             });
         }
 

@@ -59,10 +59,10 @@
             createLoginForm();
         }
         else {
-            // User is lgged in.
-            document.getElementById("loggedInUsername").innerText = getUsername();
+            // User is logged in
+            document.getElementById("loggedInUsername").innerText = localStorage.getItem('username') || 'User';
 
-            // Read parameter from URL.
+            // Read parameter from URL
             var urlParams = new URLSearchParams(window.location.search);
             var page = urlParams.get('page');
 
