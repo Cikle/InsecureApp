@@ -56,6 +56,23 @@ namespace M183.Controllers
                 return Unauthorized("login failed");
             }
 
+            // Check 2FA if enabled
+            if (user.TwoFactorEnabled)
+            {
+                if (string.IsNullOrEmpty(request.TwoFactorCode))
+                {
+                    return Unauthorized("2FA code required");
+                }
+
+                TwoFactorAuthenticator tfa = new TwoFactorAuthenticator();
+                bool isValid = tfa.ValidateTwoFactorPIN(user.TwoFactorSecret, request.TwoFactorCode);
+                
+                if (!isValid)
+                {
+                    return Unauthorized("Invalid 2FA code");
+                }
+            }
+
             var token = GenerateJwtToken(user);
             return Ok(token);
         }

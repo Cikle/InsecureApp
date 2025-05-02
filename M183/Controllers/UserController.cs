@@ -16,6 +16,31 @@ namespace M183.Controllers
             _context = context;
         }
 
+        [HttpPost("enable-2fa/{userId}")]
+        public ActionResult EnableTwoFactor(int userId)
+        {
+            var user = _context.Users.Find(userId);
+            if (user == null) return NotFound();
+
+            user.TwoFactorSecret = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 10);
+            _context.SaveChanges();
+
+            return Ok(new { SecretKey = user.TwoFactorSecret });
+        }
+
+        [HttpPost("disable-2fa/{userId}")]
+        public ActionResult DisableTwoFactor(int userId)
+        {
+            var user = _context.Users.Find(userId);
+            if (user == null) return NotFound();
+
+            user.TwoFactorSecret = null;
+            user.TwoFactorEnabled = false;
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
         /// <summary>
         /// update password
         /// </summary>

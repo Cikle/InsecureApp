@@ -9,6 +9,7 @@ namespace M183.Models
         public string Username { get; set; }
         public string Password { get; set; }
         public bool IsAdmin { get; set; }
-
+        public string? TwoFactorSecret { get; set; }
+        public bool TwoFactorEnabled { get; set; }
     }
 }
