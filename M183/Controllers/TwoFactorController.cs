@@ -61,7 +61,7 @@ namespace M183.Controllers
                 user.TwoFactorSecret, 
                 request.Code, 
                 TimeSpan.FromSeconds(30),
-                null); // Use null for default verification window
+                false); // Use null for default verification window
 
             if (!isValid) return BadRequest("Invalid code");
 
