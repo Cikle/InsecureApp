@@ -34,12 +34,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 
-// 4. Swagger/OpenAPI-Konfiguration (Für API-Dokumentation)
+// 4. Swagger/OpenAPI-Konfiguration (Fur API-Dokumentation)
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "SwaggerAnnotation", Version = "v1" });
 
-    // 5. Swagger-JWT-Unterstützung (Für Testzwecke in der Entwicklung)
+    // 5. Swagger-JWT-Unterstützung (Fur Testzwecke in der Entwicklung)
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme",
