@@ -23,7 +23,8 @@ namespace M183.Controllers
         public LoginController(NewsAppContext context, IConfiguration configuration, ILogger<LoginController> logger)
         {
             _context = context;
-            _configuration = configuration;     // JWT-Konfiguration injiziert
+            _configuration = configuration;
+            _logger = logger;
         }
 
         /// <summary>
@@ -74,6 +75,9 @@ namespace M183.Controllers
 
         private string GenerateJwtToken(User user)
         {
+            try 
+            {
+        {
             var securityKey = new SymmetricSecurityKey(
                 Convert.FromBase64String(_configuration["Jwt:Key"]!));
 
@@ -95,7 +99,13 @@ namespace M183.Controllers
                 expires: DateTime.Now.AddDays(7), // <-- Gültigkeit
                 signingCredentials: credentials);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+                return new JwtSecurityTokenHandler().WriteToken(token);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to generate JWT token for user {Username}", user.Username);
+                throw;
+            }
         }
     }
 }

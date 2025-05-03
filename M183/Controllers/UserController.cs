@@ -15,6 +15,7 @@ namespace M183.Controllers
         public UserController(NewsAppContext context, ILogger<UserController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         /// <summary>

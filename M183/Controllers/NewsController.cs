@@ -17,6 +17,7 @@ namespace M183.Controllers
         public NewsController(NewsAppContext context, ILogger<NewsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         private News SetTimezone(News news)
@@ -125,7 +126,6 @@ namespace M183.Controllers
             _context.SaveChanges();
 
             _logger.LogInformation("News ID {NewsId} updated by user {UserId}", id, news.AuthorId);
-            _logger.LogInformation("News ID {NewsId} deleted by user {UserId}", id, news.AuthorId);
             return Ok();
         }
 
