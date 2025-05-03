@@ -52,7 +52,6 @@ namespace M183.Controllers
             if (user == null)
             {
                 _logger.LogWarning("Login failed for username '{Username}' - user not found", request.Username);
-                // Return same error for invalid user/pass to prevent username enumeration
                 return Unauthorized("Invalid username or password");
             }
 
@@ -75,28 +74,28 @@ namespace M183.Controllers
 
         private string GenerateJwtToken(User user)
         {
-            try 
+            try
             {
-            var securityKey = new SymmetricSecurityKey(
-                Convert.FromBase64String(_configuration["Jwt:Key"]!));
+                var securityKey = new SymmetricSecurityKey(
+                    Convert.FromBase64String(_configuration["Jwt:Key"]!));
 
-            var credentials = new SigningCredentials(
-                securityKey, SecurityAlgorithms.HmacSha512Signature); // <-- Signaturalgorithmus
+                var credentials = new SigningCredentials(
+                    securityKey, SecurityAlgorithms.HmacSha512Signature); // <-- Signaturalgorithmus
 
-            var claims = new[]
-            {
+                var claims = new[]
+                {
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
                 new Claim(ClaimTypes.Role, user.IsAdmin ? "admin" : "user") // <-- Rolle für Autorisierung
             };
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddDays(7), // <-- Gültigkeit
-                signingCredentials: credentials);
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
+                    claims: claims,
+                    expires: DateTime.Now.AddDays(7), // <-- Gültigkeit
+                    signingCredentials: credentials);
 
                 return new JwtSecurityTokenHandler().WriteToken(token);
             }
