@@ -13,7 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<NewsAppContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SongContext")));
 
-// 2. JWT-Schlüssel aus Konfiguration laden (Server-Side)
+// 2. JWT-Schlï¿½ssel aus Konfiguration laden (Server-Side)
 var securityKey = new SymmetricSecurityKey(
     Convert.FromBase64String(builder.Configuration["Jwt:Key"]!));
 
@@ -34,12 +34,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 
-// 4. Swagger/OpenAPI-Konfiguration (Für API-Dokumentation)
+// 4. Swagger/OpenAPI-Konfiguration (Fï¿½r API-Dokumentation)
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "SwaggerAnnotation", Version = "v1" });
 
-    // 5. Swagger-JWT-Unterstützung (Für Testzwecke in der Entwicklung)
+    // 5. Swagger-JWT-Unterstï¿½tzung (Fï¿½r Testzwecke in der Entwicklung)
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme",
@@ -65,11 +65,17 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddAuthorization(); 
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// 6. Middleware-Konfiguration (Server-Side)
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<NewsAppContext>();
+    // Ensure the database is created and migrations are applied
+    dbContext.Database.Migrate();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -77,11 +83,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseDefaultFiles();
 app.UseStaticFiles();
 
-// Middleware-Pipeline
-app.UseAuthentication(); // <-- Zuerst
-app.UseAuthorization();  // <-- Dann
+// Enable authentication middleware
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 app.Run();
