@@ -42,15 +42,22 @@ namespace M183.Controllers
                 return BadRequest();
             }
 
-            string sql = "SELECT * FROM Users WHERE username = @username AND password = @password";
-            string hashedPassword = MD5Helper.ComputeMD5Hash(request.Password);
-
+            // First find user by username only
             User? user = _context.Users
-                .FromSqlRaw(sql,
-                    new SqlParameter("@username", request.Username),
-                    new SqlParameter("@password", hashedPassword))
-                .FirstOrDefault();
+                .FirstOrDefault(u => u.Username == request.Username);
 
+            if (user == null)
+            {
+                // Return same error for invalid user/pass to prevent username enumeration
+                return Unauthorized("Invalid username or password");
+            }
+
+            // Then verify password hash matches
+            string hashedPassword = MD5Helper.ComputeMD5Hash(request.Password);
+            if (user.Password != hashedPassword)
+            {
+                return Unauthorized("Invalid username or password");
+            }
             if (user == null)
             {
                 return Unauthorized("login failed");
