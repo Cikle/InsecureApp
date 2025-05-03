@@ -10,10 +10,12 @@ namespace M183.Controllers
     public class UserController : ControllerBase
     {
         private readonly NewsAppContext _context;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(NewsAppContext context)
+        public UserController(NewsAppContext context, ILogger<UserController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         /// <summary>
@@ -30,18 +32,21 @@ namespace M183.Controllers
         {
             if (request == null)
             {
+                _logger.LogWarning("Invalid password update request - null request");
                 return BadRequest("Invalid request");
             }
 
             var user = _context.Users.Find(request.UserId);
             if (user == null)
             {
+                _logger.LogWarning("Password update failed - user {UserId} not found", request.UserId);
                 return NotFound(string.Format("User {0} not found", request.UserId));
             }
 
             // Altes Passwort Verifizieren
             if (user.Password != MD5Helper.ComputeMD5Hash(request.OldPassword))
             {
+                _logger.LogWarning("Password update failed for user {Username} - old password incorrect", user.Username);
                 return BadRequest("Old password is incorrect"); 
             }
 
@@ -60,6 +65,8 @@ namespace M183.Controllers
 
             if (errors.Any())
             {
+                _logger.LogWarning("Password update failed for user {Username} - invalid new password: {Errors}", 
+                    user.Username, string.Join(", ", errors));
                 return BadRequest(string.Join(", ", errors));
             }
 
@@ -69,6 +76,7 @@ namespace M183.Controllers
             _context.Users.Update(user);
             _context.SaveChanges();
 
+            _logger.LogInformation("Password updated successfully for user {Username}", user.Username);
             return Ok("Password updated successfully");
         }
     }

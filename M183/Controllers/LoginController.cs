@@ -18,11 +18,13 @@ namespace M183.Controllers
     {
         private readonly NewsAppContext _context;
         private readonly IConfiguration _configuration; // Für JWT-Konfiguration
+        private readonly ILogger<LoginController> _logger;
 
-        public LoginController(NewsAppContext context, IConfiguration configuration)
+        public LoginController(NewsAppContext context, IConfiguration configuration, ILogger<LoginController> logger)
         {
             _context = context;
-            _configuration = configuration;     // JWT-Konfiguration injiziert
+            _configuration = configuration;
+            _logger = logger;
         }
 
         /// <summary>
@@ -39,6 +41,7 @@ namespace M183.Controllers
         {
             if (request == null || request.Username.IsNullOrEmpty() || request.Password.IsNullOrEmpty())
             {
+                _logger.LogWarning("Invalid login request - missing username or password");
                 return BadRequest();
             }
 
@@ -48,7 +51,7 @@ namespace M183.Controllers
 
             if (user == null)
             {
-                // Return same error for invalid user/pass to prevent username enumeration
+                _logger.LogWarning("Login failed for username '{Username}' - user not found", request.Username);
                 return Unauthorized("Invalid username or password");
             }
 
@@ -56,6 +59,7 @@ namespace M183.Controllers
             string hashedPassword = MD5Helper.ComputeMD5Hash(request.Password);
             if (user.Password != hashedPassword)
             {
+                _logger.LogWarning("Login failed for user '{Username}' - invalid password", user.Username);
                 return Unauthorized("Invalid username or password");
             }
             if (user == null)
@@ -64,33 +68,42 @@ namespace M183.Controllers
             }
 
             var token = GenerateJwtToken(user);
+            _logger.LogInformation("User '{Username}' logged in successfully", user.Username);
             return Ok(token);
         }
 
         private string GenerateJwtToken(User user)
         {
-            var securityKey = new SymmetricSecurityKey(
-                Convert.FromBase64String(_configuration["Jwt:Key"]!));
-
-            var credentials = new SigningCredentials(
-                securityKey, SecurityAlgorithms.HmacSha512Signature); // <-- Signaturalgorithmus
-
-            var claims = new[]
+            try
             {
+                var securityKey = new SymmetricSecurityKey(
+                    Convert.FromBase64String(_configuration["Jwt:Key"]!));
+
+                var credentials = new SigningCredentials(
+                    securityKey, SecurityAlgorithms.HmacSha512Signature); // <-- Signaturalgorithmus
+
+                var claims = new[]
+                {
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
                 new Claim(ClaimTypes.Role, user.IsAdmin ? "admin" : "user") // <-- Rolle für Autorisierung
             };
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddDays(7), // <-- Gültigkeit
-                signingCredentials: credentials);
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
+                    claims: claims,
+                    expires: DateTime.Now.AddDays(7), // <-- Gültigkeit
+                    signingCredentials: credentials);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+                return new JwtSecurityTokenHandler().WriteToken(token);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to generate JWT token for user {Username}", user.Username);
+                throw;
+            }
         }
     }
 }
