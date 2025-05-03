@@ -50,11 +50,34 @@ function createChangePasswordForm() {
     var mainTitle = document.createElement('h1');
     mainTitle.innerText = 'Change password';
 
+    var requirements = document.createElement('div');
+    requirements.classList.add('password-requirements');
+    requirements.innerHTML = '<p>Password requirements:</p><ul>' +
+        '<li>At least 8 characters</li>' +
+        '<li>At least 1 uppercase letter</li>' +
+        '<li>At least 1 lowercase letter</li>' +
+        '<li>At least 1 number</li>' +
+        '<li>At least 1 special character</li></ul>';
+
     var main = document.getElementById('main');
     main.innerHTML = '';
     main.appendChild(mainTitle);
+    main.appendChild(requirements);
 
-    /* Password. */
+    /* Old Password. */
+    var labelOldPassword = document.createElement('label');
+    labelOldPassword.innerText = 'Old password';
+
+    var inputOldPassword = document.createElement('input');
+    inputOldPassword.id = 'oldPassword';
+    inputOldPassword.type = 'password';
+
+    var divOldPassword = document.createElement('div');
+    divOldPassword.appendChild(labelOldPassword);
+    divOldPassword.innerHTML += '<br>';
+    divOldPassword.appendChild(inputOldPassword);
+
+    /* New Password. */
     var labelPassword = document.createElement('label');
     labelPassword.innerText = 'New password';
 
@@ -69,7 +92,7 @@ function createChangePasswordForm() {
 
     /* Confirm Password. */
     var labelConfirmPassword = document.createElement('label');
-    labelConfirmPassword.innerText = 'Confirm password';
+    labelConfirmPassword.innerText = 'Confirm new password';
 
     var inputConfirmPassword = document.createElement('input');
     inputConfirmPassword.id = 'confirmPassword';
