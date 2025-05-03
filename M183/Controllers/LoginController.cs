@@ -77,7 +77,6 @@ namespace M183.Controllers
         {
             try 
             {
-        {
             var securityKey = new SymmetricSecurityKey(
                 Convert.FromBase64String(_configuration["Jwt:Key"]!));
 
