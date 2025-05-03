@@ -12,8 +12,9 @@ namespace M183.Controllers
     {
         private readonly TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Central Europe Standard Time");
         private readonly NewsAppContext _context;
+        private readonly ILogger<NewsController> _logger;
 
-        public NewsController(NewsAppContext context)
+        public NewsController(NewsAppContext context, ILogger<NewsController> logger)
         {
             _context = context;
         }
@@ -72,6 +73,7 @@ namespace M183.Controllers
         {
             if (request == null)
             {
+                _logger.LogWarning("Invalid news creation request - null request");
                 return BadRequest();
             }
 
@@ -86,6 +88,7 @@ namespace M183.Controllers
             _context.News.Add(newNews);
             _context.SaveChanges();
 
+            _logger.LogInformation("News created with ID {NewsId} by user {UserId}", newNews.Id, newNews.AuthorId);
             return CreatedAtAction(nameof(GetById), new { id = newNews.Id}, newNews);
         }
 
@@ -102,12 +105,14 @@ namespace M183.Controllers
         {
             if (request == null)
             {
+                _logger.LogWarning("Invalid news update request - null request for news ID {NewsId}", id);
                 return BadRequest();
             }
 
             var news = _context.News.Find(id);
             if (news == null)
             {
+                _logger.LogWarning("News update failed - news ID {NewsId} not found", id);
                 return NotFound(string.Format("News {0} not found", id));
             }
             
@@ -119,6 +124,8 @@ namespace M183.Controllers
             _context.News.Update(news);
             _context.SaveChanges();
 
+            _logger.LogInformation("News ID {NewsId} updated by user {UserId}", id, news.AuthorId);
+            _logger.LogInformation("News ID {NewsId} deleted by user {UserId}", id, news.AuthorId);
             return Ok();
         }
 
@@ -136,6 +143,7 @@ namespace M183.Controllers
             var news = _context.News.Find(id);
             if (news == null)
             {
+                _logger.LogWarning("News deletion failed - news ID {NewsId} not found", id);
                 return NotFound(string.Format("News {0} not found", id));
             }
 

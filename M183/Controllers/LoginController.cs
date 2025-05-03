@@ -18,8 +18,9 @@ namespace M183.Controllers
     {
         private readonly NewsAppContext _context;
         private readonly IConfiguration _configuration; // Für JWT-Konfiguration
+        private readonly ILogger<LoginController> _logger;
 
-        public LoginController(NewsAppContext context, IConfiguration configuration)
+        public LoginController(NewsAppContext context, IConfiguration configuration, ILogger<LoginController> logger)
         {
             _context = context;
             _configuration = configuration;     // JWT-Konfiguration injiziert
@@ -39,6 +40,7 @@ namespace M183.Controllers
         {
             if (request == null || request.Username.IsNullOrEmpty() || request.Password.IsNullOrEmpty())
             {
+                _logger.LogWarning("Invalid login request - missing username or password");
                 return BadRequest();
             }
 
@@ -48,6 +50,7 @@ namespace M183.Controllers
 
             if (user == null)
             {
+                _logger.LogWarning("Login failed for username '{Username}' - user not found", request.Username);
                 // Return same error for invalid user/pass to prevent username enumeration
                 return Unauthorized("Invalid username or password");
             }
@@ -56,6 +59,7 @@ namespace M183.Controllers
             string hashedPassword = MD5Helper.ComputeMD5Hash(request.Password);
             if (user.Password != hashedPassword)
             {
+                _logger.LogWarning("Login failed for user '{Username}' - invalid password", user.Username);
                 return Unauthorized("Invalid username or password");
             }
             if (user == null)
@@ -64,6 +68,7 @@ namespace M183.Controllers
             }
 
             var token = GenerateJwtToken(user);
+            _logger.LogInformation("User '{Username}' logged in successfully", user.Username);
             return Ok(token);
         }
 
