@@ -30,7 +30,7 @@ namespace M183.Controllers
         {
             if (request == null)
             {
-                return BadRequest();
+                return BadRequest("Invalid request");
             }
 
             var user = _context.Users.Find(request.UserId);
@@ -38,13 +38,38 @@ namespace M183.Controllers
             {
                 return NotFound(string.Format("User {0} not found", request.UserId));
             }
+
+            // Altes Passwort Verifizieren
+            if (user.Password != MD5Helper.ComputeMD5Hash(request.OldPassword))
+            {
+                return BadRequest("Old password is incorrect"); 
+            }
+
+            // Neues Passwort Verifizieren
+            var errors = new List<string>();
+            if (request.NewPassword.Length < 8)
+                errors.Add("Password must be at least 8 characters");
+            if (!request.NewPassword.Any(char.IsUpper))
+                errors.Add("Password must contain at least one uppercase letter");
+            if (!request.NewPassword.Any(char.IsLower))
+                errors.Add("Password must contain at least one lowercase letter");
+            if (!request.NewPassword.Any(char.IsDigit))
+                errors.Add("Password must contain at least one number");
+            if (!request.NewPassword.Any(c => !char.IsLetterOrDigit(c)))
+                errors.Add("Password must contain at least one special character");
+
+            if (errors.Any())
+            {
+                return BadRequest(string.Join(", ", errors));
+            }
+
             user.IsAdmin = request.IsAdmin;
             user.Password = MD5Helper.ComputeMD5Hash(request.NewPassword);
 
             _context.Users.Update(user);
             _context.SaveChanges();
 
-            return Ok();
+            return Ok("Password updated successfully");
         }
     }
 }

@@ -1,12 +1,31 @@
 ﻿function onPasswordChange() {
+    var inputOldPassword = document.getElementById('oldPassword');
     var inputPassword = document.getElementById('password');
     var inputConfirmPassword = document.getElementById('confirmPassword');
 
-    if (!inputPassword.value) {
-        toastr.warning('Password cannot be empty', 'Warning');
+    if (!inputOldPassword.value) { // Altes Passwort muss angegeben werden
+        toastr.warning('Old password is required', 'Warning');
+    }
+    else if (!inputPassword.value) {
+        toastr.warning('New password cannot be empty', 'Warning');
+    }
+    else if (inputPassword.value.length < 8) {
+        toastr.warning('Password must be at least 8 characters', 'Warning');
+    }
+    else if (!/[a-z]/.test(inputPassword.value)) {
+        toastr.warning('Password must contain a lowercase letter', 'Warning');
+    }
+    else if (!/[A-Z]/.test(inputPassword.value)) {
+        toastr.warning('Password must contain an uppercase letter', 'Warning');
+    }
+    else if (!/[0-9]/.test(inputPassword.value)) {
+        toastr.warning('Password must contain a number', 'Warning');
+    }
+    else if (!/[^a-zA-Z0-9]/.test(inputPassword.value)) {
+        toastr.warning('Password must contain a special character', 'Warning');
     }
     else if (inputPassword.value != inputConfirmPassword.value) {
-        toastr.warning('Passwords are not equal', 'Warning');
+        toastr.warning('New passwords do not match', 'Warning');
     }
     else {
         fetch('/api/User/password-update', {
@@ -17,6 +36,7 @@
             },
             body: JSON.stringify({
                 UserId: getUserid(),
+                OldPassword: inputOldPassword.value,
                 NewPassword: inputPassword.value,
                 isAdmin: isAdmin()
             })
@@ -46,15 +66,38 @@
 }
 
 function createChangePasswordForm() {
-    /* Title. */
+    /* Passwort Änderung. */
     var mainTitle = document.createElement('h1');
     mainTitle.innerText = 'Change password';
+    /* Anzeige der Anforderungen */
+    var requirements = document.createElement('div');
+    requirements.classList.add('password-requirements');
+    requirements.innerHTML = '<p>Password requirements:</p><ul>' +
+        '<li>At least 8 characters</li>' +
+        '<li>At least 1 uppercase letter</li>' +
+        '<li>At least 1 lowercase letter</li>' +
+        '<li>At least 1 number</li>' +
+        '<li>At least 1 special character</li></ul>';
 
     var main = document.getElementById('main');
     main.innerHTML = '';
     main.appendChild(mainTitle);
+    main.appendChild(requirements);
 
-    /* Password. */
+    /* Altes Passwort. */
+    var labelOldPassword = document.createElement('label');
+    labelOldPassword.innerText = 'Old password';
+
+    var inputOldPassword = document.createElement('input');
+    inputOldPassword.id = 'oldPassword';
+    inputOldPassword.type = 'password';
+
+    var divOldPassword = document.createElement('div');
+    divOldPassword.appendChild(labelOldPassword);
+    divOldPassword.innerHTML += '<br>';
+    divOldPassword.appendChild(inputOldPassword);
+
+    /* Neues Passwort. */
     var labelPassword = document.createElement('label');
     labelPassword.innerText = 'New password';
 
@@ -69,7 +112,7 @@ function createChangePasswordForm() {
 
     /* Confirm Password. */
     var labelConfirmPassword = document.createElement('label');
-    labelConfirmPassword.innerText = 'Confirm password';
+    labelConfirmPassword.innerText = 'Confirm new password';
 
     var inputConfirmPassword = document.createElement('input');
     inputConfirmPassword.id = 'confirmPassword';
@@ -90,13 +133,13 @@ function createChangePasswordForm() {
     divButton.innerHTML += '<br>';
     divButton.appendChild(submitButton);
 
-    /* Login form. */
-    var loginForm = document.createElement('form');
-    loginForm.action = 'javascript:onPasswordChange()';
-    loginForm.appendChild(divPassword);
-    loginForm.appendChild(divConfirmPassword);
-    loginForm.appendChild(divButton);
+    /* Change password form. */
+    var changePasswordForm = document.createElement('form');
+    changePasswordForm.action = 'javascript:onPasswordChange()';
+    changePasswordForm.appendChild(divOldPassword);
+    changePasswordForm.appendChild(divPassword);
+    changePasswordForm.appendChild(divConfirmPassword);
+    changePasswordForm.appendChild(divButton);
 
-    main.appendChild(loginForm);
+    main.appendChild(changePasswordForm);
 }
-

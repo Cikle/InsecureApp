@@ -118,6 +118,40 @@ form {
     visibility: hidden;
 }
 
+.password-requirements {
+    background-color: #f8f9fa;
+    border-left: 4px solid #488286;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.password-requirements ul {
+    margin: 5px 0 0 20px;
+    padding: 0;
+}
+
+.password-requirements li {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.password-requirements {
+    background-color: #f8f9fa;
+    border-left: 4px solid #488286;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.password-requirements ul {
+    margin: 5px 0 0 20px;
+    padding: 0;
+}
+
+.password-requirements li {
+    font-size: 0.9em;
+    color: #666;
+}
+
 .notdisplayed {
     display: none;
 }
