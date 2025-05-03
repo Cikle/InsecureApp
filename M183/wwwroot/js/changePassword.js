@@ -3,7 +3,7 @@
     var inputPassword = document.getElementById('password');
     var inputConfirmPassword = document.getElementById('confirmPassword');
 
-    if (!inputOldPassword.value) {
+    if (!inputOldPassword.value) { // Altes Passwort muss angegeben werden
         toastr.warning('Old password is required', 'Warning');
     }
     else if (!inputPassword.value) {
@@ -66,10 +66,10 @@
 }
 
 function createChangePasswordForm() {
-    /* Title. */
+    /* Passwort Änderung. */
     var mainTitle = document.createElement('h1');
     mainTitle.innerText = 'Change password';
-
+    /* Anzeige der Anforderungen */
     var requirements = document.createElement('div');
     requirements.classList.add('password-requirements');
     requirements.innerHTML = '<p>Password requirements:</p><ul>' +
@@ -84,7 +84,7 @@ function createChangePasswordForm() {
     main.appendChild(mainTitle);
     main.appendChild(requirements);
 
-    /* Old Password. */
+    /* Altes Passwort. */
     var labelOldPassword = document.createElement('label');
     labelOldPassword.innerText = 'Old password';
 
@@ -97,7 +97,7 @@ function createChangePasswordForm() {
     divOldPassword.innerHTML += '<br>';
     divOldPassword.appendChild(inputOldPassword);
 
-    /* New Password. */
+    /* Neues Passwort. */
     var labelPassword = document.createElement('label');
     labelPassword.innerText = 'New password';
 

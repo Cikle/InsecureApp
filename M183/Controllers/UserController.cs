@@ -39,13 +39,13 @@ namespace M183.Controllers
                 return NotFound(string.Format("User {0} not found", request.UserId));
             }
 
-            // Verify old password
+            // Altes Passwort Verifizieren
             if (user.Password != MD5Helper.ComputeMD5Hash(request.OldPassword))
             {
-                return BadRequest("Old password is incorrect");
+                return BadRequest("Old password is incorrect"); 
             }
 
-            // Validate new password
+            // Neues Passwort Verifizieren
             var errors = new List<string>();
             if (request.NewPassword.Length < 8)
                 errors.Add("Password must be at least 8 characters");

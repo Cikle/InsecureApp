@@ -10,19 +10,39 @@ function parseJwt(token) {
     return JSON.parse(jsonPayload); // Enthält payload.role
 }
 
+function getUserIdFromToken(token) {
+    const payload = parseJwt(token);
+    return payload.nameid;
+}
+
 function onLogin() {
+    var inputUsername = document.getElementById("username");
+    var inputPassword = document.getElementById("password");
+
     fetch("/api/Login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            Username: document.getElementById("username").value,
-            Password: document.getElementById("password").value
+            Username: inputUsername.value,
+            Password: inputPassword.value
         })
     })
-        .then(response => response.text())
-        .then(token => {
-            localStorage.setItem(tokenKey, token);
-            window.location.href = "index.html";
+        .then((response) => {
+            if (response.ok) {
+                return response.text().then((token) => {
+                    localStorage.setItem('jwtToken', token);
+                    localStorage.setItem('username', inputUsername.value);
+                    localStorage.setItem('userid', getUserIdFromToken(token));
+                    window.location.href = "index.html";
+                });
+            } else {
+                return response.text().then((error) => {
+                    throw new Error(error || "Login failed");
+                });
+            }
+        })
+        .catch((error) => {
+            alert(error.message);
         });
 }
 
@@ -56,6 +76,8 @@ function getUserid() {
 
 function resetUser() {
     localStorage.removeItem(tokenKey);
+    localStorage.removeItem('username');
+    localStorage.removeItem('userid');
 }
 
 function isAdmin() {
@@ -131,3 +153,4 @@ function createLoginForm() {
 
     main.appendChild(loginForm);
 }
+
