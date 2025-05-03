@@ -7,11 +7,11 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Logging-Konfiguration hinzufügen  
+// Logging-Konfiguration hinzufÃ¼gen  
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();  // Logs in der Konsole  
 builder.Logging.AddDebug();    // Debug-Output in Entwicklungsumgebungen  
-builder.Logging.SetMinimumLevel(LogLevel.Information); // Filter für minimale Protokollierung  
+builder.Logging.SetMinimumLevel(LogLevel.Information); // Filter fÃ¼r minimale Protokollierung  
 
 builder.Services.AddControllers();
 
@@ -19,7 +19,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<NewsAppContext>(options =>
    options.UseSqlServer(builder.Configuration.GetConnectionString("SongContext")));
 
-// 2. JWT-Schlüssel aus Konfiguration laden (Server-Side)  
+// 2. JWT-SchlÃ¼ssel aus Konfiguration laden (Server-Side)
 var securityKey = new SymmetricSecurityKey(
    Convert.FromBase64String(builder.Configuration["Jwt:Key"]!));
 
@@ -39,12 +39,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
        };
    });
 
-// 4. Swagger/OpenAPI-Konfiguration (Fur API-Dokumentation)  
+// 4. Swagger/OpenAPI-Konfiguration (FÃ¼r API-Dokumentation)
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "SwaggerAnnotation", Version = "v1" });
 
-    // 5. Swagger-JWT-Unterstützung (Fur Testzwecke in der Entwicklung)  
+    // 5. Swagger-JWT-UnterstÃ¼tzung (FÃ¼r Testzwecke in der Entwicklung)
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme",
@@ -74,7 +74,13 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// 6. Middleware-Konfiguration (Server-Side)  
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<NewsAppContext>();
+    // Ensure the database is created and migrations are applied
+    dbContext.Database.Migrate();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -82,11 +88,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseDefaultFiles();
 app.UseStaticFiles();
 
-// Middleware-Pipeline  
-app.UseAuthentication(); // <-- Zuerst  
-app.UseAuthorization();  // <-- Dann  
+// Enable authentication middleware
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 app.Run();
